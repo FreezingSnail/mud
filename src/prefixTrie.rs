@@ -1,5 +1,7 @@
 use std::collections::BTreeMap;
 
+
+#[derive(Debug)]
 struct  PrefixTrieNode {
     children: BTreeMap<char, PrefixTrieNode>
 }
@@ -20,62 +22,50 @@ impl PrefixTrieNode {
     
 }
 
-
-enum PrefixTrie {
-    Empty,
-    Root(PrefixTrieNode)
+#[derive(Debug)]
+struct PrefixTrie {
+    root: PrefixTrieNode
 }
 
 
 impl PrefixTrie {
     fn new() -> Self {
-        PrefixTrie::Root(PrefixTrieNode { children: BTreeMap::new()})
+        PrefixTrie{root: PrefixTrieNode { children: BTreeMap::new()}}
     }
 
     pub fn insert(&mut self, word: &str) {
-        match self {
-            PrefixTrie::Empty => {
-                return
-            },
-            PrefixTrie::Root(ref mut root) => {
-                root.insert(word);
-            }
-        }
+        self.root.insert(word);
     }
 
-    pub fn search(self, prefix: String) -> bool {
-        match self {
-            PrefixTrie::Empty => false,
-            PrefixTrie::Root(root) => {
-                let mut cur = &root;
-                for c in prefix.chars() {
-                    if !cur.children.contains_key(&c) {
-                        return false;
-                    }
-                    cur = cur.children.get(&c).unwrap()
-                }
-                return true
+    pub fn search(&self, prefix: String) -> bool {
+        let mut cur = &self.root;
+        for c in prefix.chars() {
+            if !cur.children.contains_key(&c) {
+                return false;
             }
+            cur = cur.children.get(&c).unwrap()
         }
+        return true
     }
+}
     
      
 
-}
 
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    const COMMANDS: [&str; 2] = ["enter", "look"];
+    const COMMANDS: [&str;3] = ["enter", "look", "pickup"];
 
     #[test]
     fn build() {
-        let mut trie = PrefixTrie::Empty;
+        let mut trie = PrefixTrie::new();
         for c in COMMANDS {
             trie.insert(c);
-            assert!(trie.search(c.to_string()));
+            assert!(trie.search(c.to_string()))
         }
+        println!("{:?}", trie)
 
     }
 
